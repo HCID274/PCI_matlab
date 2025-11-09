@@ -1,0 +1,4 @@
+path	./
+in	/work/DTMP/lhqing/PCI/Data/matlab_input/
+out	/work/DTMP/lhqing/PCI/Data/matlab_output/
+endian	ieee-le

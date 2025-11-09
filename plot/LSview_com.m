@@ -6,7 +6,7 @@ function [pout1, pout2] = LSview_com(sim,data_n,t,var)
 %
 oldpath=path;
 path('../com',oldpath);
-f_path='path.txt';
+f_path='path_matlab.txt';
 %
 switch sim
     case {'R5F', 'r5f'}
@@ -51,19 +51,55 @@ end
 fread_param2(dataC);
 fread_EQ1(dataC);
 %
-A=importdata(f_condition,',',5);
-pp1=A.data(1,:);
-wid1=A.data(2,1);
-wid2=A.data(2,2);
-div1=A.data(3,1);
-div2=A.data(3,2);
-divls=A.data(3,3);
+% 手动读取条件文件
+fid = fopen(f_condition, 'r');
+if fid == -1
+    error('无法打开条件文件: %s', f_condition);
+end
+
+% 读取所有行并跳过注释
+lines = {};
+while ~feof(fid)
+    line = fgetl(fid);
+    if ~isempty(line) && line(1) ~= '#'
+        lines{end+1} = line;
+    end
+end
+fclose(fid);
+
+if length(lines) < 3
+    error('条件文件格式错误');
+end
+
+% 解析数据
+pp1 = sscanf(lines{1}, '%f,%f,%f,%f,%f,%f');
+wid1 = sscanf(lines{2}, '%f,%f');
+div_data = sscanf(lines{3}, '%d,%d,%d');
+
+fprintf('调试信息:\n');
+fprintf('pp1: %s\n', mat2str(pp1));
+fprintf('wid1: %s\n', mat2str(wid1));
+fprintf('div_data: %s\n', mat2str(div_data));
+
+wid2 = wid1(2);
+div1 = div_data(1);
+div2 = div_data(2);
+divls = div_data(3);
+
+% 修正wid1为标量
+wid1 = wid1(1);
 %
 B1=zeros(2,3);
 xl=zeros(2,3);
 p1=zeros(3,1);
 B1(1,:)=pp1(1:3);
 B1(2,:)=pp1(4:6);
+
+fprintf('调试信息:\n');
+fprintf('pp1: %s\n', mat2str(pp1));
+fprintf('B1: %s\n', mat2str(B1));
+fprintf('B1(1,3): %s\n', mat2str(B1(1,3)));
+fprintf('B1 size: %s\n', mat2str(size(B1)));
 B2(:,1)=B1(:,1).*cos(2*pi*B1(:,3));
 B2(:,2)=B1(:,1).*sin(2*pi*B1(:,3));
 B2(:,3)=B1(:,2);
