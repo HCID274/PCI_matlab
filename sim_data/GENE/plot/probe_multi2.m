@@ -6,7 +6,7 @@ function [pout,R,Z]=probe_multi2(sim,data_n,t,num1,x1,var,p1)
 %
 oldpath=path;
 path('../com',oldpath);
-f_path='path.txt';
+f_path='path_matlab.txt';
 %
 switch sim
     case {'GENE', 'gene'}
