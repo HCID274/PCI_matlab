@@ -1,0 +1,97 @@
+% read data file
+function p2=fread_data(obj,file,m,n)% file name, mode m,n
+p=zeros(obj.IRMAX+1,1);
+p2=zeros(obj.IRMAX+1,2);
+fid=fopen(file,'r',obj.endian);
+RET=fread(fid,1,'int');
+Lm=find(obj.LKY==m);
+Ln=find(obj.LKZ==n);
+%skip (L-1) data
+TMP=fread(fid,(obj.IRMAX+1)*(obj.KYM)*(Ln-1)*2+(obj.IRMAX+1)*(Lm-1)*2,'double');
+%
+IROUT=128;
+%
+%PHI
+data1=fread(fid,[2,obj.IRMAX+1],'double');
+datac=data1(1,:)+i*data1(2,:);% complex
+subplot(221);
+plot(obj.R,real(datac),'r',obj.R,imag(datac),'b');
+title('PHI');
+xlabel('r');
+axis tight
+legend('Real','Imag','Location','Best')
+pout=datac(1:fix(end/IROUT):end);
+pout2=[obj.R(1:fix(end/IROUT):end).';real(pout);imag(pout)];
+TMP=fread(fid,(obj.IRMAX+1)*(obj.KYM)*(obj.LZM)*2,'double');
+%
+%VPL
+data1=fread(fid,[2,obj.IRMAX+1],'double');
+datac=data1(1,:)+i*data1(2,:);% complex
+subplot(223);
+plot(obj.R,real(datac),'r',obj.R,imag(datac),'b');
+title('VPL');
+xlabel('r');
+axis tight
+pout=datac(1:fix(end/IROUT):end);
+pout2=[pout2;real(pout);imag(pout)];
+TMP=fread(fid,(obj.IRMAX+1)*2*obj.LMAX,'double');
+%
+%NE
+data1=fread(fid,[2,obj.IRMAX+1],'double');
+datac=data1(1,:)+i*data1(2,:);% complex
+subplot(224);
+plot(obj.R,real(datac),'r',obj.R,imag(datac),'b');
+title('NE');
+xlabel('r');
+axis tight
+pout=datac(1:fix(end/IROUT):end);
+pout2=[pout2;real(pout);imag(pout)];
+%
+%NEQ
+frewind(fid);
+RET=fread(fid,1,'int');
+TMP=fread(fid,(obj.IRMAX+1)*4*(obj.LMAX+1),'double');
+data1=fread(fid,[2,obj.IRMAX+1],'double');
+datac=data1(1,:)+i*data1(2,:)+obj.NEQ.';% complex
+subplot(222);
+plot(obj.R,real(datac));
+title('NEQ');
+xlabel('r');
+axis tight
+%
+%nVr
+datac2=zeros(1,size(pout2,2));
+datac2(2:end)=-2.0*(pout2(6,2:end)+i*pout2(7,2:end))...
+    *(i*m)./pout2(1,2:end).*(pout2(2,2:end)-i*pout2(3,2:end));
+datac2(1)=0;
+pout2=[pout2;real(datac2)];
+%str=sprintf('%sflux.dat',outdir);
+%dlmwrite(str,real(datac2), '-append');
+subplot(222);
+plot(pout2(1,:),real(datac2));
+axis tight
+title('flux');
+xlabel('r');
+%axis([0,1,0,5]);
+%
+%Xi
+datac2(2:end-1)=log(abs(pout2(2,3:end)+i*pout2(3,3:end))...
+    ./abs(pout2(2,1:end-2)+i*pout2(3,1:end-2))...
+    .*abs(pout2(6,1:end-2)+i*pout2(7,1:end-2))...
+    ./abs(pout2(6,3:end)+i*pout2(7,3:end)));
+datac2(1)=0;
+datac2(end)=0;
+pout2=[pout2;real(datac2)];
+subplot(222);
+%plot(pout2(1,:),real(datac2));
+axis tight
+title('Xi');
+xlabel('r');
+%axis([0,1,0,5]);
+%
+str=sprintf('%sFVN.dat',obj.outdir);
+dlmwrite(str,pout2.','\t');
+%
+fclose(fid);
+%
+end

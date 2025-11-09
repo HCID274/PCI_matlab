@@ -1,0 +1,17 @@
+in_pos1	0.8
+in_pos2	0.0
+in_pos3	0.8
+in_ene  0.02
+in_ang1 0.2*pi/2
+in_ang2 0.0*pi/2
+tracemax 1000
+out_pos1    1.7
+out_pos2    0.0
+out_pos3    -0.15
+#out_pos1    1.5
+#out_pos3    0.25
+mass    85
+dang    0.01*pi/2
+dti 0.1
+da1_min 0.001*pi/2
+da2_min 0.01

@@ -1,0 +1,77 @@
+function hibp_com(sim,data_n,t,c_num)
+% simulation type: 1(NLD),2(DISA),3(R4F),3.5(R5F),4(MIPS),5(FORTEC3D)
+% data#, time(0:time series), traj#(if t/=0)
+%
+oldpath = path;
+path('../com',oldpath);
+f_path='path.txt';
+%
+switch sim
+    case {'NLD', 'nld'}
+        FVER=1;
+        oldpath=addpath('../sim_data/nld','../sim_data/nld/hibp');
+        dataC=nldClass(f_path,data_n);
+    case {'DISA', 'disa'}
+        FVER=2;
+        dataC=disaClass(f_path,data_n);
+    case {'R4F', 'r4f'}
+        FVER=3;
+        dataC=r4fClass(f_path,data_n);
+    case {'R5F', 'r5f'}
+        FVER=3.5;
+        dataC=r5fClass(f_path,data_n);
+    case {'MIPS', 'mips'}
+        FVER=4;
+        oldpath=addpath('../sim_data/mips','../sim_data/mips/hibp');
+        dataC=hibpClass_mips(f_path,data_n);
+    case {'FORTEC', 'fortec'}
+        FVER=5;
+        dataC=fortecClass(f_path,data_n);
+    otherwise
+        error('Unexpected simulation type.')
+end
+%
+% set beam probe condition
+f_condition='condition.txt';
+fread_condition(dataC,f_condition);
+%
+% parameters
+fread_param2(dataC);
+if(FVER ~= dataC.FVER)
+    error('Simulation type mismatch.')
+end
+%
+% equilibrium
+fread_EQ1(dataC);
+%
+if t == 0
+    search_trajectory_ts(dataC);
+else
+    
+switch cal
+    case 'one_shot'
+        dataC.num=1;
+        search_trajectory_rho(dataC, dataC.num);
+    case 'multi_shot'
+        dataC.num=10;
+        search_trajectory_rho(dataC, dataC.num);
+    case 'time_series'
+        search_trajectory_ts(dataC);
+	case 'data_convert'
+        t=dataC.t;
+        fread_plasma_r4f(dataC,t);
+        data_convert(dataC,t);
+    otherwise
+        error('Unexpected calculation type.')
+end
+
+
+
+
+
+
+
+
+path(oldpath)
+end
+

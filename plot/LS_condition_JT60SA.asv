@@ -1,0 +1,9 @@
+3# center of the line of sight (R[mm],Z[mm],phi[2pi(0:1)])
+# injection -> detection
+# width wid1[m],wid2[m](toroidal)
+# number of grid points
+# [-div1:div1](vertical), [-div2:div2](toroidal),[0:divls](LS)
+
+5000.0, -200, 0.1, 5000.0, 200, 0.475
+0.30,0.30
+4,3,3000

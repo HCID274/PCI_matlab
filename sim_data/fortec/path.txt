@@ -1,0 +1,4 @@
+path	./../
+in	E:/documents/data/FORTEC/
+out	E:/documents/data/output/
+endian	ieee-be

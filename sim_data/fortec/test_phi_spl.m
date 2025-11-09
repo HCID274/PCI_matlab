@@ -1,0 +1,62 @@
+test_read;
+%dataC.PLASMA_PHI_total(num2,num3,num1);
+%dataC.theta_si(num2);
+%dataC.phi_si(num3);
+%rho(1:num1)=1.0/(num1-1)*[0:num1-1];
+%rho=probeEQ_local_s(dataC,R0,Z0,PHI0,dataC.rho)
+
+num1=dataC.num1;
+rho(1:num1)=1.0/(num1-1)*[0:num1-1];
+XSD=dataC.theta_si(1);
+XLD=dataC.theta_si(end);
+YSD=dataC.phi_si(1);
+YLD=dataC.phi_si(end);
+ZSD=rho(1);
+ZLD=rho(end);
+NCDX=dataC.num2;
+NCDY=dataC.num3;
+NCDZ=dataC.num1;
+NCDX6=NCDX+6;
+NCDY6=NCDY+6;
+NCDZ6=NCDZ+6;
+SPLIN3(XSD,XLD, YSD,YLD, ZSD,ZLD, NCDX6,NCDY6,NCDZ6);
+%
+NF=1;
+FA=zeros(NF,NCDX6,NCDY6,NCDZ6);
+FA(1,4:end-3,4:end-3,4:end-3)=dataC.PLASMA_PHI_total;
+%FA(1,1:3,:,:)=FA(1,end-6:end-4,:,:);%cyclic
+%FA(1,end-2:end,:,:)=FA(1,5:7,:,:);%cyclic
+%FA(1,:,1:3,:)=FA(1,:,end-6:end-4,:);%cyclic
+%FA(1,:,end-2:end,:)=FA(1,:,5:7,:);%cyclic
+W0=zeros(NF,1);
+%
+R0=4.0;
+PHI0=0.2*pi;
+Z0=-0.1;
+%
+DR3=dataC.phi_si(2)-dataC.phi_si(1);
+cw=((PHI0-dataC.phi_si(1))/DR3)+1;
+c1=fix(cw);
+c2=c1+1;
+THETA1=mod(atan2(Z0-dataC.zax(c1),R0-dataC.Rax(c1)),2*pi);
+THETA2=mod(atan2(Z0-dataC.zax(c2),R0-dataC.Rax(c2)),2*pi);
+THETA0=THETA1*(c2-cw)+THETA2*(cw-c1);
+XD=THETA0;%theta
+YD=PHI0;%phi
+ZD=probeEQ_local_s(dataC,R0,Z0,PHI0,dataC.rho);%rho
+%XD=0.3*pi;
+%YD=0.05*pi;
+%ZD=0.50;
+[XD,YD,ZD]
+W0=SPL3DF(NF, FA, XD, YD, ZD)
+XD_id1=fix((XD-XSD)/((XLD-XSD)/(NCDX-1)))+4;
+YD_id1=fix((YD-YSD)/((YLD-YSD)/(NCDY-1)))+4;
+ZD_id1=fix((ZD-ZSD)/((ZLD-ZSD)/(NCDZ-1)))+4;
+XD_id2=XD_id1+1;
+YD_id2=YD_id1+1;
+ZD_id2=ZD_id1+1;
+NFP=1;
+[FA(NFP,XD_id1,YD_id1,ZD_id1),FA(NFP,XD_id2,YD_id1,ZD_id1),...
+    FA(NFP,XD_id1,YD_id2,ZD_id1),FA(NFP,XD_id2,YD_id2,ZD_id1),...
+    FA(NFP,XD_id1,YD_id1,ZD_id2),FA(NFP,XD_id2,YD_id1,ZD_id2),...
+    FA(NFP,XD_id1,YD_id2,ZD_id2),FA(NFP,XD_id2,YD_id2,ZD_id2)]-W0(NFP)

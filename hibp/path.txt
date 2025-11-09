@@ -1,0 +1,12 @@
+path	./../
+#in	E:/documents/data/MIPS/
+in	E:/documents/data/FORTEC/
+#in	E:/documents/data/R5F/
+#in  E:/data/FORTEC/yoshihara/
+#in	/storage/data4/kasuya/data/MIPS/
+#in	/work/kasuya/data/NTM/
+#out	./
+out	E:/documents/data/output/
+#out	E:/data/output/
+endian	ieee-be
+#endian	ieee-le

@@ -1,0 +1,59 @@
+classdef nldClass < pathClass
+    properties
+    %PRM
+        FVER;
+        Te;
+        IRMAX;
+        KYM;
+        KZM;
+        WIN;
+        WEN;
+        WEI;
+        RHOS;
+        A;
+        BT;
+        MASSN;
+        LAMBDA;
+        VISVOL;
+        VISVPL;
+        VISNE;
+        LMAX;
+        LSTA;
+        LEND;
+        LKY;
+        LKZ;
+        R;
+        PHIEQ;
+        VEQ;
+        NEQ;
+        PHIS;
+        VPLS;
+        NES;
+    %PLASMA
+        PLASMA_PHI0;
+        PLASMA_PHI1;
+        PLASMA_PHI_total;
+        PLASMA_VPL0;
+        PLASMA_VPL1;
+        PLASMA_VPL_total;
+        PLASMA_NE0;
+        PLASMA_NE1;
+        PLASMA_NE_total;
+    %ptprflist
+        TIME;
+        COUNT;
+        TS;
+        TE;
+    end
+%    
+    methods
+        function obj = nldClass(f_path,data_n)
+            fread_path(obj,f_path,data_n);
+        end
+%
+        fread_param2(obj);
+        fread_plasma1(obj,t);
+        p2=fread_data_1(f_n,obj,file,m,n)
+        p2=fread_data_s(f_n,obj,file)
+    end
+end

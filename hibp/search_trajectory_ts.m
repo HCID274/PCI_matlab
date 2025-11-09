@@ -1,0 +1,100 @@
+%time series scan
+function search_trajectory_ts(dataC)
+global result
+% Number of processor 
+%proc=6;
+%
+fi=10;
+tt=1;
+TCS=input('from = ');
+TCE=input('to = ');
+TIN=input('interval = ');
+TCS=TCS*100;
+TCE=TCE*100;
+TIN=TIN*100;
+TIME = TCS:TIN:TCE;
+COUNT = numel(TIME);
+%
+dataC.ion_p=dataC.tracemax*0.3;
+vini=sqrt(dataC.in_ene/dataC.mass)*13.8; %[m/microsec]
+%
+timep_out= zeros(COUNT,1);
+bp_out=zeros(COUNT,1);
+n1_out=zeros(COUNT,1);
+inten_out=zeros(COUNT,1);
+xout=zeros(dataC.tracemax*fi,COUNT);
+yout=xout;
+zout=xout;
+vout=xout;
+ion_p=dataC.ion_p*fi;
+%
+%
+fread_plasma1(dataC,TCS/100);
+plot_plasma1(dataC,0);
+tracemax = dataC.tracemax;
+ion_p=fix(ion_p/fi);
+%Computation convergence
+ion_p = conv(dataC, dataC.in_ang1, dataC.in_ang2, tracemax, vini, ion_p);
+tracemax=tracemax*fi;
+ion_p=ion_p*fi;
+%
+%
+parfor (b=1:COUNT,5)
+%for b=1:COUNT
+    if (TIME(b)>=TCS && TIME(b)<=TCE && mod(TIME(b),TIN)==0)
+        t=TIME(b)/100;
+        timep=t;
+        %
+        fread_plasma1(dataC,t);
+        %{
+        if b == 0
+        tracemax=dataC.tracemax;
+        ion_p=fix(ion_p/fi)
+        %Computation convergence
+        [tracemax, ion_p] = conv(dataC, dataC.in_ang1, tracemax, vini, ion_p);
+        % solution with fine spatial resolution
+            tracemax=tracemax*fi;
+            ion_p=ion_p*fi;
+        end
+        %}
+        x0=zeros(6,1);
+        %x0(1)=(EQ.RG1(1)+EQ.RG1(2))/2;
+        x0(1)=dataC.in_pos(1);
+        x0(4)=-vini*sin(dataC.in_ang1)*cos(dataC.in_ang2);
+        x0(2)=dataC.in_pos(2);
+        x0(5)=vini*sin(dataC.in_ang2)/x0(1);
+        %x0(3)=EQ.RG2(1);
+        x0(3)=dataC.in_pos(3);
+        x0(6)=-vini*cos(dataC.in_ang1)*cos(dataC.in_ang2);
+        %
+        [x, y, z, v, bp, inten]=hibp_inj(dataC,x0,tracemax,ion_p);
+        
+        n1=fix(ion_p);
+        %
+        0.5*(v(bp)^2-v(1)^2)*dataC.mass/9.58*1.0e5
+        %0.5*(v(bp)^2-v(1)^2)*dataC.mass/9.58*1.0e5/Te
+        
+        %
+        timep_out(b)=timep;
+        bp_out(b)=bp;
+        n1_out(b)=n1
+        inten_out(b)=inten;
+        xout(:,b)=x(:);
+        yout(:,b)=y(:);
+        zout(:,b)=z(:);
+        vout(:,b)=v(:);
+    end
+end
+
+result.timep_out=timep_out;
+result.bp_out=bp_out;
+result.n1_out=n1_out;
+result.inten_out=inten_out;
+result.xout=xout;
+result.yout=yout;
+result.zout=zout;
+result.vout=vout;
+% data output
+str=sprintf('%strace_%08.4f_ts.mat',dataC.outdir,dataC.in_ang1)
+save(str,'timep_out','bp_out','n1_out','inten_out','xout','yout','zout','vout');
+end

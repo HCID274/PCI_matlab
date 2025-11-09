@@ -1,0 +1,6 @@
+path	./../
+#in	E:/documents/data/MIPS/
+#in	/storage/data4/kasuya/data/MIPS/
+in	/work/kasuya/data/MIPS/
+out	./
+endian	ieee-be

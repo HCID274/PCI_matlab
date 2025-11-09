@@ -1,0 +1,26 @@
+%path	./../
+%in	E:/documents/data/R6F/
+%in	E:/documents/data/R5F/
+%in	E:/documents/data/NLD/
+%in	/work/kasuya/data/R5F/
+%in	/work/kasuya/data/NLD/
+%out	./
+%out	E:/documents/data/output/
+%endian	ieee-le
+
+
+path	./../
+%in	/work/kasuya/data/R5F/
+%in	/storage/data4/kasuya/data/R6F/
+%in	/storage/data5/work/r.miyamoto/R6Fdata/
+%in	/work/kasuya/data/NLD/
+%in /home/kuwamiya/data/R5F/
+%in /work/kasuya/data/R5F/
+%in /storage/data5/work/kuwamiya/R5Fdata/
+%in /storage/data5/work/kuwamiya/data/R5F/
+%in /storage/data5/work/kuwamiya/data/R6F/
+%in /storage/data5/work/r.miyamoto/R6Fdata/
+in /storage/data5/work/kuwamiya/data/GENE/
+%out	./
+out /storage/data5/work/kuwamiya/output
+endian	ieee-le

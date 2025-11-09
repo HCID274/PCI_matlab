@@ -1,0 +1,159 @@
+% rho scan
+function search_trajectory_rho(dataC,t,num)
+global result
+% plasma
+fread_plasma1(dataC,t);
+
+%data_convert(dataC,t)
+plot_plasma1(dataC,(dataC.in_pos(2)+dataC.out_pos(2))/2);
+%
+%
+%dataC.ion_p=dataC.tracemax*0.3; %move to fread_condition1.m
+vini=sqrt(dataC.in_ene/dataC.mass)*13.8; %[m/microsec]
+%
+%fi=dataC.fi;
+fi=1;
+ang_s=zeros(num,1);
+%ang_s=dataC.in_ang1+(0.35-0.17)/2*[0:num-1]*pi/(num-1);
+if num == 1
+    ang_s =dataC.in_ang1
+else
+    %ang_s=dataC.in_ang1+dataC.in_width*[0:num-1]/(num-1)%mips
+    %ang_s=dataC.in_ang1+(0.25/2*pi-dataC.in_ang1)*[0:num-1]/(num-1)%r4f
+    %ang_s=dataC.in_ang1+(0.17/2*pi-dataC.in_ang1)*[0:num-1]/(num-1)%fortec
+    ang_s=dataC.in_ang1+(dataC.in_ang1_end-dataC.in_ang1)*[0:num-1]/(num-1);
+end
+result.in_ang1=ang_s;
+%
+%plot_plasma1(dataC);
+bp_out=zeros(num,1);
+n1_out=zeros(num,1);
+in_ang2_out=zeros(num,1);
+ion_p_out=zeros(num,1);
+inten_out=zeros(num,1);
+xout=zeros(dataC.tracemax*fi,num);
+yout=xout;
+zout=xout;
+vout=xout;
+%tracemax1=dataC.tracemax*fi;
+%ion_p1=dataC.ion_p*fi;
+tracemax=dataC.tracemax*fi;
+ion_p=dataC.ion_p*fi;
+in_ang2=dataC.in_ang2;
+%pause
+%parfor (b=1:num,5)
+for b=1:num
+    %dataC.in_ang1=ang_s(b);
+    %tracemax=tracemax1/fi;
+    %ion_p=ion_p1;
+    tracemax=tracemax/fi;
+    ion_p=fix(ion_p/fi);
+    %Computation convergence
+    %[ion_p, in_ang2] = conv(dataC, ang_s(b), dataC.in_ang2, tracemax, vini, ion_p);
+    [ion_p, in_ang2] = conv(dataC, ang_s(b), in_ang2, tracemax, vini, ion_p);
+    % solution with fine spatial resolution
+    tracemax=tracemax*fi;
+    ion_p=ion_p*fi;
+    %ion_p1=ion_p;
+    %
+    x0=zeros(6,1);
+    %x0(1)=(EQ.RG1(1)+EQ.RG1(2))/2;
+    x0(1)=dataC.in_pos(1);
+    x0(4)=-vini*sin(ang_s(b))*cos(in_ang2);
+    x0(2)=dataC.in_pos(2);
+    x0(5)=vini*sin(in_ang2)/x0(1);
+    %x0(3)=EQ.RG2(1);
+    x0(3)=dataC.in_pos(3);
+    x0(6)=-vini*cos(ang_s(b))*cos(in_ang2);
+    %
+    [x, y, z, v, bp, inten]=hibp_inj(dataC,x0,tracemax,ion_p);
+    n1=fix(ion_p);
+    %
+    %0.5*(v(bp)^2-v(1)^2)*dataC.mass/9.58*1.0e5
+    %0.5*(v(bp)^2-v(1)^2)*dataC.mass/9.58*1.0e5/Te
+    %
+    %[v(bp), v(1), 0.5*(v(bp)^2-v(1)^2)*dataC.mass/9.58*1.0e5];
+    %
+    R0=sqrt(x(n1)^2+y(n1)^2);
+    PHI0=atan2(y(n1),x(n1));
+    Z0=z(n1);
+    [x(n1),y(n1),z(n1)]
+    [ang_s(b),in_ang2,ion_p,tracemax]
+    %[R0,PHI0,Z0,probeEQ_local_s(dataC,R0,Z0,PHI0,dataC.PHI)]
+    %[R0,PHI0,Z0,probeEQ_local1(dataC,R0,Z0,PHI0,dataC.PHIt_re,dataC.PHIt_im)]
+    %}
+    % plot the final result
+    %plot_plasma1(dataC);
+    if 1==0
+        figure(b);
+        plot_plasma1(dataC)
+        hold on
+        plot(sqrt(x(n1).^2+y(n1).^2),z(n1),'ro')
+        plot(sqrt(x(1:bp).^2+y(1:bp).^2),z(1:bp))
+        axis equal
+        drawnow
+        hold off
+        %pause
+        %plot_traj(dataC,x,y,z,bp,n1)
+        %sprintf('%d shot',b)
+    end
+    if 1 ==1
+    figure(1)
+    hold on
+    plot(sqrt(x(n1).^2+y(n1).^2),z(n1),'ro', 'linewidth',1.5);
+    plot(sqrt(x(1:bp).^2+y(1:bp).^2),z(1:bp),'k');
+    plot(sqrt(x(bp).^2+y(bp).^2),z(bp),'k*');
+    %axis equal
+    drawnow
+    hold off
+    figure(2)
+    hold on
+	plot3(x(n1),y(n1),z(n1),'ro', 'linewidth',2);
+	plot3(x(1:bp),y(1:bp),z(1:bp),'b-', 'linewidth',1.5);
+	plot3(x(bp),y(bp),z(bp),'k*');
+	hold off
+    %
+    figure(4)
+    hold on
+    plot(sqrt(x(n1).^2+y(n1).^2),z(n1),'ro', 'linewidth',1.5);
+    plot(sqrt(x(1:bp).^2+y(1:bp).^2),z(1:bp),'k-', 'linewidth',1.5);
+	plot(sqrt(x(bp).^2+y(bp).^2),z(bp),'k*');
+    hold off
+    drawnow
+    end
+    %
+    bp_out(b)=bp;
+    n1_out(b)=n1;
+    in_ang2_out(b)=in_ang2;
+    ion_p_out(b)=ion_p;
+    inten_out(b)=inten;
+    xout(:,b)=x(:);
+    yout(:,b)=y(:);
+    zout(:,b)=z(:);
+    vout(:,b)=v(:);
+    b
+    out_ene=(v(bp-1)/13.8)^2*dataC.mass;
+    local_poten=probeEQ_local_s(dataC,R0,Z0,PHI0,dataC.PLASMA_PHI_total)*1.0E-6;
+    [dataC.in_ene,out_ene]
+    [dataC.in_ene-out_ene, -local_poten]
+    dataC.in_ene-out_ene+local_poten
+    inten
+end
+%{
+fig_name = sprintf('%strace_2D%08.4f.png',dataC.outdir,dataC.in_ang1)
+saveas(gcf,fig_name);
+%}
+result.bp=bp_out;
+result.n1=n1_out;
+result.in_ang2=in_ang2_out;
+result.ion_p=ion_p_out;
+result.inten=inten_out;
+result.xout=xout;
+result.yout=yout;
+result.zout=zout;
+result.vout=vout;
+% data output
+%str=sprintf('%strace_%08.4f_rho_%d.mat',dataC.outdir,dataC.in_ang1,dataC.tracemax)
+str=sprintf('%strace_%08.4f_rho_%d_t%d.mat',dataC.outdir,dataC.in_ang1,dataC.tracemax,t)
+save(str,'bp_out','n1_out','inten_out','xout','yout','zout','vout');
+end

@@ -1,0 +1,7 @@
+#number of points, range [min,max]
+# R, major radius [Rmin:Rmax]
+num1	8	0.7	0.9
+# Z, vertical [Zmin:Zmax]
+num2	8	-0.2	0.2
+# phi, toroidal [0:1]
+num3	1	0	1.0

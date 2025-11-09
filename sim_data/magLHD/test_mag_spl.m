@@ -1,0 +1,44 @@
+test_read;
+XSD=dataC.R_mag(1);
+XLD=dataC.R_mag(end);
+YSD=dataC.Phi_mag(end);
+YLD=dataC.Phi_mag(1);
+ZSD=dataC.Z_mag(1);
+ZLD=dataC.Z_mag(end);
+NCDX=dataC.NRGM;
+NCDY=dataC.NPHIGM;
+NCDZ=dataC.NZGM;
+NCDX6=NCDX+6;
+NCDY6=NCDY+6;
+NCDZ6=NCDZ+6;
+SPLIN3(XSD,XLD, YSD,YLD, ZSD,ZLD, NCDX6,NCDY6,NCDZ6);
+%
+NF=3;
+FA=zeros(NF,NCDX6,NCDY6,NCDZ6);
+FA(1,4:end-3,4:end-3,4:end-3)=dataC.BF1;
+%FA(1,:,1:3,:)=FA(1,:,end-6:end-4,:);%cyclic
+%FA(1,:,end-2:end,:)=FA(1,:,5:7,:);%cyclic
+FA(2,4:end-3,4:end-3,4:end-3)=dataC.BF2;
+%FA(2,:,1:3,:)=FA(2,:,end-6:end-4,:);
+%FA(2,:,end-2:end,:)=FA(2,:,5:7,:);
+FA(3,4:end-3,4:end-3,4:end-3)=dataC.BF3;
+%FA(3,:,1:3,:)=FA(3,:,end-6:end-4,:);
+%FA(3,:,end-2:end,:)=FA(3,:,5:7,:);
+W0=zeros(NF,1);
+%
+XD=4.15;
+YD=0.2*pi*1.01*1.01;
+ZD=-5.0;
+[XD,YD,ZD]
+W0=SPL3DF(NF, FA, XD, YD, ZD)
+XD_id1=fix((XD-XSD)/((XLD-XSD)/(NCDX-1)))+4;
+YD_id1=fix((YD-YSD)/((YLD-YSD)/(NCDY-1)))+4;
+ZD_id1=fix((ZD-ZSD)/((ZLD-ZSD)/(NCDZ-1)))+4;
+XD_id2=XD_id1+1;
+YD_id2=YD_id1+1;
+ZD_id2=ZD_id1+1;
+NFP=3;
+[FA(NFP,XD_id1,YD_id1,ZD_id1),FA(NFP,XD_id2,YD_id1,ZD_id1),...
+    FA(NFP,XD_id1,YD_id2,ZD_id1),FA(NFP,XD_id1,YD_id1,ZD_id2),...
+    FA(NFP,XD_id2,YD_id2,ZD_id1),FA(NFP,XD_id1,YD_id2,ZD_id2),...
+    FA(NFP,XD_id2,YD_id1,ZD_id2),FA(NFP,XD_id2,YD_id2,ZD_id2)]-W0(NFP)
