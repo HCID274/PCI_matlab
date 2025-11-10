@@ -148,7 +148,7 @@ hold off
 ylim([0,1])
 xlabel('beam path')
 ylabel('ρ')
-minmax = sprintf('ρ_{min} = %.2f , ρ_{max} = %.2f',min(loc, [], 'omitnan'), max(loc, [], 'omitnan'));
+minmax = sprintf('ρ_{min} = %.2f , ρ_{max} = %.2f',min(loc), max(loc));
 title(minmax);
 legend("With fluctuation","Without fluctuation",'Location', 'Best')
 %
