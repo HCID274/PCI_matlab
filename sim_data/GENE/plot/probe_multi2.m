@@ -105,6 +105,9 @@ for i = 1:dataC.NTGMAX
 end
 data3 = [data3; data3(1,:,:)];
 
+processed_density_field_ml = data3;
+save('processed_density_field_ml.mat', 'processed_density_field_ml', '-v7');
+
 loc=zeros(num1,1);
 nonloc=zeros(num1,1);
 xx = NaN(num1,1);
